@@ -32,13 +32,16 @@ const puppeteer = require('puppeteer');
     const page = await browser.newPage();
     await page.goto('https://www.urbanhire.com/jobs');
     const result = await page.evaluate(() => {
-        let title = document.getElementsByClassName('m-b-lg').getElementsByTagName('H2').innerHTML;
+        let elements = Array.from(document.querySelectorAll('h2[itemprop="title"]'));
+        let titles = elements.map(element => {
+            return element.innerText
+        })
         return {
-            title
+            titles
         }
-    })
+    });
 
-    console.log(result)
+    console.log(result);
 
     browser.close()
 })()
