@@ -33,3 +33,44 @@ exports.jobList = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.addjob = async (req, res, next) => {
+    const errors = validationResult(req);
+
+    try {
+        if (!errors.isEmpty()) {
+            const error = new Error('Validation failed');
+            error.statusCode = 422;
+            error.data = errors.array();
+            throw error;
+        }
+        const jobName = req.body.jobName;
+        const companyName = req.body.companyName;
+        const jobLocation = req.body.jobLocation;
+        let description = req.body.description;
+        if (!description) {
+            description = "No description"
+        }
+
+        const job = new Job({
+            jobName: jobName,
+            companyName: companyName,
+            jobLocation: jobLocation,
+            description: description
+        });
+        const result = await job.save();
+        res.status(201).json({
+            message: 'Job successfully added',
+            job: result
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500
+        }
+        next(err)
+    }
+};
+
+exports.editjob = (req, res, next) => { };
+
+exports.removejob = (req, res, next) => { };

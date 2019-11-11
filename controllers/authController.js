@@ -27,7 +27,7 @@ exports.signup = async (req, res, next) => {
             password: hashedPw,
             mobilePhone: mobilePhone,
             firstName: firstName,
-            lastName: lastName,
+            lastName: lastName
         });
 
         const result = await user.save();
