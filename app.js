@@ -48,7 +48,7 @@ mongoose
     )
     .then(result => {
         console.log('Connected');
-        app.listen(8080, scraping.getjobs);
+        app.listen(8080, scraping.getNumberOfJob);
     })
     .catch(err => {
         console.log(err);
