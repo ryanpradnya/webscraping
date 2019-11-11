@@ -6,6 +6,9 @@ const mongoose = require('mongoose');
 const authRoute = require('./routes/authRoute');
 const userRoute = require('./routes/userRoute');
 
+// Import Scraping
+const scraping = require('./controllers/scraping');
+
 const app = express();
 
 const MONGODB_URI = 'mongodb://localhost:27017/UrbanhireJobs';
@@ -38,11 +41,14 @@ app.use((error, req, res, next) => {
 // Connect database and run server using port 8080
 mongoose
     .connect(
-        MONGODB_URI, { useNewUrlParser: true }
+        MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }
     )
     .then(result => {
         console.log('Connected');
-        app.listen(8080);
+        app.listen(8080, scraping.getjobs);
     })
     .catch(err => {
         console.log(err);
