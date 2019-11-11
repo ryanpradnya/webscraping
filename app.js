@@ -1,48 +1,49 @@
-const request = require('request');
-const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
-// request('https://www.urbanhire.com/jobs', (error, response, html) => {
-//     if (!error && response.statusCode == 200) {
-//         const $ = cheerio.load(html);
-//         let jobName = [];
-//         let companyName = [];
-//         let jobLocation = [];
-//         let jobFuction = [];
-//         let jobIndustry = [];
+// Import Route
+const authRoute = require('./routes/authRoute');
+const userRoute = require('./routes/userRoute');
 
-//         $('.m-b-lg').each((i, el) => {
-//             $(el).find('h2').each((j, data) => {
-//                 jobName[j] = $(data).text();
-//             });
-//             $(el).find('h3').each((j, data) => {
-//                 companyName[j] = $(data).text();
-//             });
+const app = express();
 
-//         });
-//         console.log(jobName);
-//         console.log(companyName);
+const MONGODB_URI = 'mongodb://localhost:27017/UrbanhireJobs';
 
-//         console.log('Scraping Done...');
-//     }
-// });
 
-(async () => {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto('https://www.urbanhire.com/jobs');
-    const result = await page.evaluate(() => {
-        let elements = Array.from(document.querySelectorAll('h2[itemprop="title"]'));
-        let titles = elements.map(element => {
-            return element.innerText
-        })
-        return {
-            titles
-        }
+app.use(bodyParser.json());
+
+// Allow Cors
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+
+// Use Route
+app.use('/api/auth/', authRoute);
+app.use('/api/user/', userRoute);
+
+// Error Handling
+app.use((error, req, res, next) => {
+    console.log(error);
+    const status = error.statusCode || 500;
+    const message = error.message;
+    const data = error.data;
+    res.status(status).json({ message: message, data: data });
+});
+
+
+// Connect database and run server using port 8080
+mongoose
+    .connect(
+        MONGODB_URI, { useNewUrlParser: true }
+    )
+    .then(result => {
+        console.log('Connected');
+        app.listen(8080);
+    })
+    .catch(err => {
+        console.log(err);
     });
-
-    console.log(result);
-
-    browser.close()
-})()
-
