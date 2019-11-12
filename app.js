@@ -11,12 +11,13 @@ const scraping = require('./controllers/scraping');
 
 const app = express();
 
+// Mongodb URI, adjust the database to be used
 const MONGODB_URI = 'mongodb://localhost:27017/UrbanhireJobs';
 
 
 app.use(bodyParser.json());
 
-// Allow Cors
+// Middleware to allow Cors
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
@@ -48,7 +49,7 @@ mongoose
     )
     .then(result => {
         console.log('Connected');
-        app.listen(8080, scraping.getNumberOfJob);
+        app.listen(8080, scraping.getjobs);
     })
     .catch(err => {
         console.log(err);
