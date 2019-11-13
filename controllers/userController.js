@@ -6,6 +6,9 @@ const Job = require('../models/job');
 
 exports.jobList = async (req, res, next) => {
     const errors = validationResult(req);
+    const currentPage = req.query.page || 1;
+    // const jobName = req.query.job || '';
+    const perPage = 10;
 
     try {
         if (!errors.isEmpty()) {
@@ -14,7 +17,11 @@ exports.jobList = async (req, res, next) => {
             throw error
         }
 
-        const jobs = await Job.find();
+        const totalJobs = await Job.find().countDocuments();
+        // const jobs = await Job.find({ jobName: new RegExp('/^' + jobName + '$/', "i") })
+        const jobs = await Job.find()
+            .skip((currentPage - 1) * perPage)
+            .limit(perPage);
 
         if (!jobs) {
             const error = new Error('job list not found');
@@ -23,6 +30,7 @@ exports.jobList = async (req, res, next) => {
         }
         res.status(200).json({
             message: 'Fetch job list successfully',
+            totalJobs: totalJobs,
             jobList: jobs
         })
 
